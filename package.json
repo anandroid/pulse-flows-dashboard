@@ -1,26 +1,27 @@
 {
   "name": "pulse-flows-dashboard",
   "version": "1.0.0",
-  "description": "Web dashboard for Pulse Flows content management system",
+  "description": "Frontend dashboard for Pulse Flows content crawling and management system",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "echo 'Building dashboard assets...' && mkdir -p dist && cp -r views/* dist/ && cp -r static/* dist/ 2>/dev/null || true",
-    "serve": "npx http-server dist -p 3000 -c-1"
+    "build": "echo 'Static files ready for deployment'",
+    "serve": "node server.js"
   },
-  "keywords": ["dashboard", "pulse-flows", "content-management"],
-  "author": "Pulse Team",
+  "keywords": [
+    "pulse-flows",
+    "dashboard",
+    "content-management",
+    "crawling",
+    "ai"
+  ],
+  "author": "Pulse Flows Team",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "helmet": "^7.0.0"
-  },
-  "devDependencies": {
-    "http-server": "^14.1.1"
+    "express": "^4.18.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=16.0.0"
   }
 }

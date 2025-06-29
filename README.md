@@ -76,3 +76,46 @@ Dashboard Repositories:
 - **Modern UI**: Glassmorphism design with responsive layout
 
 Built with ❤️ using Claude Code
+
+## Quick Start
+
+### Local Development
+```bash
+# Install dependencies
+npm install
+
+# Start the dashboard server
+npm start
+```
+
+Visit: http://localhost:3000
+
+### Static Deployment
+The dashboard can be deployed to any static hosting service:
+- **Netlify**: Connect repository, build: `npm run build`, publish: `.`
+- **Vercel**: Connect repository, framework: Other, output: `.`
+- **GitHub Pages**: Enable in settings, source: main branch
+
+### Node.js Deployment
+For dynamic hosting with Express server:
+- **Heroku**: Connect repository, buildpack: Node.js
+- **Railway/Render**: Connect repository, start: `npm start`
+
+See `DEPLOYMENT.md` for detailed instructions.
+
+## Architecture
+
+```
+pulse-flows-dashboard/         # Frontend Dashboard (this repo)
+├── index.html                 # Main entry point
+├── admin-dashboard.html       # Navigation hub
+├── crawl-dashboard.html       # Crawl management
+├── admin-*.html              # Admin interfaces
+├── js/admin/                 # JavaScript modules
+├── server.js                 # Express server
+└── package.json              # Dependencies
+
+pulse-flows/                   # Backend API (separate repo)
+├── src/                      # API source code
+└── dist/                     # Compiled API
+```

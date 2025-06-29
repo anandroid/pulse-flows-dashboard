@@ -1,0 +1,9 @@
+
+> pulse-flows-dashboard@1.0.0 start
+> node server.js
+
+🎛️  Pulse Flows Dashboard running on http://localhost:3000
+📊 Health check: http://localhost:3000/health
+🔗 Main Dashboard: http://localhost:3000/
+📝 Admin Simple: http://localhost:3000/admin-simple
+📊 Admin Table: http://localhost:3000/admin-table
