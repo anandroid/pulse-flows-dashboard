@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Labeling Admin - Pulse Flows</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Simple enhancements */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .content-card {
+            transition: all 0.2s ease;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .content-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-card.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .label-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        select, input[type="date"], input[type="number"] {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        button {
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <h1 class="text-2xl font-bold text-gray-900">Content Labeling Admin</h1>
+                <p class="text-sm text-gray-500 mt-1">Label and score content for trending algorithm training</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Area Selection -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="area-select" class="block text-sm font-medium text-gray-700 mb-2">
+                            Select Area
+                        </label>
+                        <select id="area-select" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Loading areas...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="date-select" class="block text-sm font-medium text-gray-700 mb-2">
+                            Date
+                        </label>
+                        <input type="date" id="date-select" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                        <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-2">
+                            Category Filter
+                        </label>
+                        <select id="category-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">All Categories</option>
+                            <option value="events">Events</option>
+                            <option value="deals">Deals</option>
+                            <option value="news">News</option>
+                            <option value="reels">Reels</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="load-content" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition shadow-sm">
+                    Load Content
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="grid grid-cols-4 gap-4 text-center">
+                    <div>
+                        <p class="text-2xl font-bold text-gray-900" id="total-count">0</p>
+                        <p class="text-sm text-gray-500">Total Items</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-green-600" id="selected-count">0</p>
+                        <p class="text-sm text-gray-500">Selected</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-blue-600" id="local-count">0</p>
+                        <p class="text-sm text-gray-500">Local</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-purple-600" id="national-count">0</p>
+                        <p class="text-sm text-gray-500">National</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <h3 class="text-lg font-medium mb-3">Bulk Actions</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button class="bulk-action px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition text-sm font-medium" data-action="select-all">
+                        Select All
+                    </button>
+                    <button class="bulk-action px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition text-sm font-medium" data-action="deselect-all">
+                        Deselect All
+                    </button>
+                    <button class="bulk-action px-4 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition text-sm font-medium" data-action="mark-local">
+                        Mark Selected as Local
+                    </button>
+                    <button class="bulk-action px-4 py-2 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition text-sm font-medium" data-action="mark-national">
+                        Mark Selected as National
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div id="content-container" class="space-y-4">
+                <!-- Content items will be loaded here -->
+            </div>
+
+            <!-- Submit Button -->
+            <div class="sticky bottom-0 bg-white shadow-lg p-4 mt-6 rounded-lg">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-600">
+                            <span id="labeled-count">0</span> items labeled
+                        </p>
+                    </div>
+                    <button id="submit-labels" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition disabled:bg-gray-400" disabled>
+                        Submit Labels for <span id="submit-area">Area</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-4 text-gray-700">Loading...</p>
+        </div>
+    </div>
+
+    <script src="/js/admin/content-labeling.js"></script>
+</body>
+</html>

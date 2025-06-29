@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Labeling Admin - Pulse Flows</title>
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+    
+    <!-- Simple custom styles -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .filter-group {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .filter-group select, .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex: 1;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-local {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-national {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+        
+        .badge-category {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .bulk-actions {
+            margin-bottom: 15px;
+        }
+        
+        .bulk-actions button {
+            margin-right: 10px;
+        }
+        
+        /* DataTable customizations */
+        table.dataTable {
+            border-collapse: collapse !important;
+        }
+        
+        table.dataTable tbody tr.selected {
+            background-color: #dbeafe !important;
+        }
+        
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+            margin-bottom: 10px;
+        }
+        
+        .dataTables_wrapper .dataTables_length {
+            float: left;
+            margin-bottom: 10px;
+        }
+        
+        .scope-select, .quality-input, .relevance-input {
+            width: 100px;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .trending-checkbox {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 style="margin: 0 0 10px 0;">Content Labeling Admin</h1>
+            <p style="margin: 0; color: #6b7280;">Label and score content for trending algorithm training</p>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="selected-count" style="color: #3b82f6;">0</div>
+                <div class="stat-label">Selected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="local-count" style="color: #10b981;">0</div>
+                <div class="stat-label">Local</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="national-count" style="color: #8b5cf6;">0</div>
+                <div class="stat-label">National</div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Area</label>
+                <select id="area-select" style="width: 200px;">
+                    <option value="">Loading areas...</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Date</label>
+                <input type="date" id="date-select">
+            </div>
+            <div class="filter-group">
+                <label>Category</label>
+                <select id="category-filter">
+                    <option value="">All Categories</option>
+                    <option value="events">Events</option>
+                    <option value="deals">Deals</option>
+                    <option value="news">News</option>
+                    <option value="reels">Reels</option>
+                </select>
+            </div>
+            <button id="load-content" class="btn btn-primary">Load Content</button>
+        </div>
+        
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="bulk-actions">
+                <button class="btn btn-secondary bulk-action" data-action="mark-local">Mark Selected as Local</button>
+                <button class="btn btn-secondary bulk-action" data-action="mark-national">Mark Selected as National</button>
+                <button id="submit-labels" class="btn btn-success" style="float: right;" disabled>
+                    Submit Labels for <span id="submit-area">Area</span>
+                </button>
+            </div>
+            
+            <table id="content-table" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Source</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Scope</th>
+                        <th>Quality</th>
+                        <th>Relevance</th>
+                        <th>Trending</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+    <script src="/js/admin/content-labeling-table.js"></script>
+</body>
+</html>

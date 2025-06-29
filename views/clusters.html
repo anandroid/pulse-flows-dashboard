@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluster Management - Pulse Flows</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        select, input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .cluster-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .cluster-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cluster-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .cluster-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .cluster-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .cluster-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .cluster-examples {
+            font-size: 14px;
+            color: #555;
+            font-style: italic;
+        }
+        
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        
+        .label-local {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .label-hyperlocal {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .label-national {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        
+        .confidence-meter {
+            display: inline-block;
+            width: 60px;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-left: 10px;
+            position: relative;
+            top: 1px;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: #4caf50;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .sample-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .sample-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .sample-meta {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Cluster Management</h1>
+            <p class="subtitle">Monitor and manage content clustering for auto-labeling</p>
+        </div>
+        
+        <div class="stats-grid" id="stats">
+            <div class="stat-card">
+                <div class="stat-value">-</div>
+                <div class="stat-label">Total Clusters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">-</div>
+                <div class="stat-label">Active Clusters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">-</div>
+                <div class="stat-label">Avg Cluster Size</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">-</div>
+                <div class="stat-label">Avg Similarity</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label>Scope</label>
+                <select id="scopeFilter">
+                    <option value="">All Scopes</option>
+                    <option value="local">Local</option>
+                    <option value="hyperlocal">Hyperlocal</option>
+                    <option value="national">National</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Status</label>
+                <select id="activeFilter">
+                    <option value="true">Active Only</option>
+                    <option value="false">All Clusters</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Min Size</label>
+                <input type="number" id="minSizeFilter" placeholder="e.g. 5" min="1">
+            </div>
+            
+            <button onclick="loadClusters()">Apply Filters</button>
+            <button onclick="runMaintenance()">Run Maintenance</button>
+        </div>
+        
+        <div class="cluster-list">
+            <div class="cluster-header">
+                <h2>Clusters</h2>
+                <span id="clusterCount">Loading...</span>
+            </div>
+            <div id="clusterContent">
+                <div class="loading">Loading clusters...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="clusterModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Cluster Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+    
+    <script>
+        let currentClusters = [];
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/flows/clusters/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.querySelector('.stats-grid').innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-value">${data.clusters.total}</div>
+                            <div class="stat-label">Total Clusters</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${data.clusters.active}</div>
+                            <div class="stat-label">Active Clusters</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${data.clusters.avgSize.toFixed(1)}</div>
+                            <div class="stat-label">Avg Cluster Size</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${(data.clusters.avgSimilarity * 100).toFixed(0)}%</div>
+                            <div class="stat-label">Avg Similarity</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadClusters() {
+            const scope = document.getElementById('scopeFilter').value;
+            const active = document.getElementById('activeFilter').value;
+            const minSize = document.getElementById('minSizeFilter').value;
+            
+            const params = new URLSearchParams();
+            if (scope) params.append('scope', scope);
+            params.append('active', active);
+            if (minSize) params.append('minSize', minSize);
+            params.append('limit', '100');
+            
+            try {
+                document.getElementById('clusterContent').innerHTML = '<div class="loading">Loading clusters...</div>';
+                
+                const response = await fetch(`/api/flows/clusters?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentClusters = data.clusters;
+                    displayClusters(data.clusters);
+                    document.getElementById('clusterCount').textContent = `${data.clusters.length} clusters`;
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                document.getElementById('clusterContent').innerHTML = 
+                    `<div class="error">Failed to load clusters: ${error.message}</div>`;
+            }
+        }
+        
+        function displayClusters(clusters) {
+            if (clusters.length === 0) {
+                document.getElementById('clusterContent').innerHTML = 
+                    '<div class="loading">No clusters found matching filters</div>';
+                return;
+            }
+            
+            const html = clusters.map(cluster => `
+                <div class="cluster-item" onclick="showClusterDetails('${cluster.id}')">
+                    <div class="cluster-title">
+                        ${cluster.tags.join(', ') || 'Cluster ' + cluster.id.substring(0, 8)}
+                    </div>
+                    <div class="cluster-meta">
+                        <span>${getLabelBadge(cluster.labels)}</span>
+                        <span>${getConfidenceMeter(cluster.labels.confidence)}</span>
+                        <span>👥 ${cluster.memberCount} items</span>
+                        <span>🎯 ${(cluster.avgSimilarity * 100).toFixed(0)}% similarity</span>
+                        <span>⚡ ${(cluster.activeScore * 100).toFixed(0)}% active</span>
+                    </div>
+                    <div class="cluster-examples">
+                        Examples: ${cluster.examples.slice(0, 2).join(' • ')}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('clusterContent').innerHTML = html;
+        }
+        
+        function getLabelBadge(label) {
+            const className = `label-${label.scope}`;
+            return `<span class="label-badge ${className}">${label.scope}</span>`;
+        }
+        
+        function getConfidenceMeter(confidence) {
+            const width = Math.round(confidence * 100);
+            return `
+                <span class="confidence-meter">
+                    <span class="confidence-fill" style="width: ${width}%"></span>
+                </span>
+                ${width}%
+            `;
+        }
+        
+        async function showClusterDetails(clusterId) {
+            const modal = document.getElementById('clusterModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            try {
+                modalContent.innerHTML = '<div class="loading">Loading cluster details...</div>';
+                modal.style.display = 'flex';
+                
+                const response = await fetch(`/api/flows/clusters/${clusterId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const cluster = data.cluster;
+                    const sampleHtml = data.sampleContent.map(content => `
+                        <div class="sample-content">
+                            <div class="sample-title">${content.title}</div>
+                            <div class="sample-meta">
+                                ${content.source} • ${content.area} • ${new Date(content.timestamp).toLocaleDateString()}
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    modalContent.innerHTML = `
+                        <h3>Cluster Information</h3>
+                        <p><strong>ID:</strong> ${cluster.id}</p>
+                        <p><strong>Labels:</strong> ${getLabelBadge(cluster.labels)} ${getConfidenceMeter(cluster.labels.confidence)}</p>
+                        <p><strong>Size:</strong> ${cluster.memberCount} items</p>
+                        <p><strong>Average Similarity:</strong> ${(cluster.avgSimilarity * 100).toFixed(1)}%</p>
+                        <p><strong>Active Score:</strong> ${(cluster.activeScore * 100).toFixed(0)}%</p>
+                        <p><strong>Tags:</strong> ${cluster.tags.join(', ') || 'None'}</p>
+                        <p><strong>Primary Source:</strong> ${cluster.metadata.primarySource || 'Mixed'}</p>
+                        <p><strong>Last Updated:</strong> ${new Date(cluster.lastUpdated).toLocaleString()}</p>
+                        
+                        <h3 style="margin-top: 20px;">Example Content</h3>
+                        ${sampleHtml || '<p>No sample content available</p>'}
+                        
+                        <h3 style="margin-top: 20px;">Update Labels</h3>
+                        <div style="display: flex; gap: 10px; align-items: flex-end;">
+                            <div class="filter-group">
+                                <label>Scope</label>
+                                <select id="updateScope">
+                                    <option value="local" ${cluster.labels.scope === 'local' ? 'selected' : ''}>Local</option>
+                                    <option value="hyperlocal" ${cluster.labels.scope === 'hyperlocal' ? 'selected' : ''}>Hyperlocal</option>
+                                    <option value="national" ${cluster.labels.scope === 'national' ? 'selected' : ''}>National</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Confidence</label>
+                                <input type="number" id="updateConfidence" value="${cluster.labels.confidence}" min="0" max="1" step="0.1">
+                            </div>
+                            <button onclick="updateClusterLabels('${cluster.id}')">Update</button>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                modalContent.innerHTML = `<div class="error">Failed to load cluster details: ${error.message}</div>`;
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('clusterModal').style.display = 'none';
+        }
+        
+        async function updateClusterLabels(clusterId) {
+            const scope = document.getElementById('updateScope').value;
+            const confidence = parseFloat(document.getElementById('updateConfidence').value);
+            
+            try {
+                const response = await fetch(`/api/flows/clusters/${clusterId}/labels`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scope, confidence })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Labels updated successfully!');
+                    closeModal();
+                    loadClusters();
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                alert(`Failed to update labels: ${error.message}`);
+            }
+        }
+        
+        async function runMaintenance() {
+            if (!confirm('Run cluster maintenance? This will decay, merge, and archive clusters as needed.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/flows/clusters/maintenance', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Maintenance complete!\n- Decayed: ${data.result.clustersDecayed}\n- Merged: ${data.result.clustersMerged}\n- Archived: ${data.result.clustersArchived}`);
+                    loadStats();
+                    loadClusters();
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                alert(`Failed to run maintenance: ${error.message}`);
+            }
+        }
+        
+        // Load initial data
+        loadStats();
+        loadClusters();
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('clusterModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

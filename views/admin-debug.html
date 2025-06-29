@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Debug Tools - Pulse Flows</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        
+        .header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .debug-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .debug-section h3 {
+            margin-bottom: 15px;
+            color: #1f2937;
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+        }
+        
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .results pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .loading {
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .success {
+            color: #059669;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .analysis-summary {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .analysis-summary h4 {
+            margin-bottom: 10px;
+            color: #1e40af;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .score-bar {
+            width: 100px;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+        
+        .score-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔍 Search Debug Tools</h1>
+            <p>Analyze search relevance and debug content similarity issues</p>
+        </div>
+        
+        <div class="two-column">
+            <!-- Content Similarity Debug -->
+            <div class="debug-section">
+                <h3>🎯 Content Similarity Debug</h3>
+                <p style="color: #6b7280; margin-bottom: 15px; font-size: 14px;">
+                    Analyze why a specific content item appears in search results
+                </p>
+                
+                <form id="contentDebugForm">
+                    <div class="form-group">
+                        <label for="contentId">Content ID:</label>
+                        <input type="text" id="contentId" placeholder="Enter content ID" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentQuery">Search Query:</label>
+                        <input type="text" id="contentQuery" placeholder="Enter search query" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentArea">Area (optional):</label>
+                        <input type="text" id="contentArea" placeholder="e.g., tampa, new-york">
+                    </div>
+                    
+                    <button type="submit" class="btn" id="contentDebugBtn">Analyze Content</button>
+                </form>
+                
+                <div id="contentResults" class="results" style="display: none;"></div>
+            </div>
+            
+            <!-- Search Analysis -->
+            <div class="debug-section">
+                <h3>📊 Search Results Analysis</h3>
+                <p style="color: #6b7280; margin-bottom: 15px; font-size: 14px;">
+                    Analyze search results and scoring patterns
+                </p>
+                
+                <form id="searchAnalysisForm">
+                    <div class="form-group">
+                        <label for="searchQuery">Search Query:</label>
+                        <input type="text" id="searchQuery" placeholder="Enter search query" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="searchArea">Area (optional):</label>
+                        <input type="text" id="searchArea" placeholder="e.g., tampa, new-york">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="searchLimit">Results Limit:</label>
+                        <select id="searchLimit">
+                            <option value="5">5 results</option>
+                            <option value="10" selected>10 results</option>
+                            <option value="20">20 results</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="searchAnalysisBtn">Analyze Search</button>
+                </form>
+                
+                <div id="searchResults" class="results" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility functions
+        function showLoading(elementId, button) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.innerHTML = '<div class="loading">🔄 Loading...</div>';
+            button.disabled = true;
+        }
+        
+        function showError(elementId, message, button) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.innerHTML = `<div class="error">❌ ${message}</div>`;
+            button.disabled = false;
+        }
+        
+        function showSuccess(elementId, data, button) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            
+            let html = '<div class="success">✅ Analysis complete</div>';
+            
+            if (data.analysis) {
+                html += `
+                    <div class="analysis-summary">
+                        <h4>Similarity Scores</h4>
+                        <div class="score-item">
+                            <span>Content: ${(data.analysis.contentScore * 100).toFixed(1)}%</span>
+                            <div class="score-bar"><div class="score-fill" style="width: ${data.analysis.contentScore * 100}%"></div></div>
+                        </div>
+                        <div class="score-item">
+                            <span>Location: ${(data.analysis.locationScore * 100).toFixed(1)}%</span>
+                            <div class="score-bar"><div class="score-fill" style="width: ${data.analysis.locationScore * 100}%"></div></div>
+                        </div>
+                        <div class="score-item">
+                            <span>Temporal: ${(data.analysis.temporalScore * 100).toFixed(1)}%</span>
+                            <div class="score-bar"><div class="score-fill" style="width: ${data.analysis.temporalScore * 100}%"></div></div>
+                        </div>
+                        <p style="margin-top: 10px;"><strong>Dominant Factor:</strong> ${data.analysis.dominantFactor}</p>
+                        <p><strong>Recommendation:</strong> ${data.analysis.recommendation}</p>
+                    </div>
+                `;
+            }
+            
+            html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            element.innerHTML = html;
+            button.disabled = false;
+        }
+        
+        // Content Debug Form Handler
+        document.getElementById('contentDebugForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const contentId = document.getElementById('contentId').value;
+            const query = document.getElementById('contentQuery').value;
+            const area = document.getElementById('contentArea').value;
+            const button = document.getElementById('contentDebugBtn');
+            
+            showLoading('contentResults', button);
+            
+            try {
+                const response = await fetch('/api/flows/admin/debug/content-similarity', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contentId,
+                        query,
+                        area: area || undefined
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('contentResults', data, button);
+                } else {
+                    showError('contentResults', data.error || 'Analysis failed', button);
+                }
+            } catch (error) {
+                showError('contentResults', `Request failed: ${error.message}`, button);
+            }
+        });
+        
+        // Search Analysis Form Handler
+        document.getElementById('searchAnalysisForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const query = document.getElementById('searchQuery').value;
+            const area = document.getElementById('searchArea').value;
+            const limit = parseInt(document.getElementById('searchLimit').value);
+            const button = document.getElementById('searchAnalysisBtn');
+            
+            showLoading('searchResults', button);
+            
+            try {
+                const response = await fetch('/api/flows/admin/debug/search-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query,
+                        area: area || undefined,
+                        limit
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    let html = '<div class="success">✅ Search analysis complete</div>';
+                    
+                    if (data.summary) {
+                        html += `
+                            <div class="analysis-summary">
+                                <h4>Search Summary (${data.totalResults} results)</h4>
+                                <div class="score-item">
+                                    <span>Avg Content: ${(data.summary.averageContentScore * 100).toFixed(1)}%</span>
+                                    <div class="score-bar"><div class="score-fill" style="width: ${data.summary.averageContentScore * 100}%"></div></div>
+                                </div>
+                                <div class="score-item">
+                                    <span>Avg Location: ${(data.summary.averageLocationScore * 100).toFixed(1)}%</span>
+                                    <div class="score-bar"><div class="score-fill" style="width: ${data.summary.averageLocationScore * 100}%"></div></div>
+                                </div>
+                                <div class="score-item">
+                                    <span>Avg Temporal: ${(data.summary.averageTemporalScore * 100).toFixed(1)}%</span>
+                                    <div class="score-bar"><div class="score-fill" style="width: ${data.summary.averageTemporalScore * 100}%"></div></div>
+                                </div>
+                                <p style="margin-top: 10px;">
+                                    <strong>Location-dominated results:</strong> ${data.summary.locationDominatedResults}/${data.detailedResults.length}
+                                </p>
+                                ${data.summary.missingEmbeddings ? `
+                                    <p><strong>Missing embeddings:</strong> 
+                                        Content: ${data.summary.missingEmbeddings.content}, 
+                                        Location: ${data.summary.missingEmbeddings.location}, 
+                                        Temporal: ${data.summary.missingEmbeddings.temporal}
+                                    </p>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
+                    
+                    html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                    document.getElementById('searchResults').innerHTML = html;
+                    document.getElementById('searchResults').style.display = 'block';
+                } else {
+                    showError('searchResults', data.error || 'Analysis failed', button);
+                }
+                
+                button.disabled = false;
+            } catch (error) {
+                showError('searchResults', `Request failed: ${error.message}`, button);
+            }
+        });
+    </script>
+</body>
+</html>

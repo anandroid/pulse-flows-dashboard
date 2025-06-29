@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse Flows - Admin Dashboard</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-online {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-description {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .card-body {
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .btn-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .btn-success:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .btn-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        
+        .btn-warning:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+        
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .quick-actions h3 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div>
+                <h1>
+                    🎛️ Pulse Flows Admin Dashboard
+                </h1>
+                <div class="header-subtitle">
+                    Central control panel for content crawling and management
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="status-badge status-online">
+                    <span class="status-indicator"></span>
+                    <span id="server-status">System Online</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Main Dashboard Cards -->
+        <div class="dashboard-grid">
+            <!-- Crawl Management -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🚀</div>
+                    <div>
+                        <div class="card-title">Crawl Management</div>
+                        <div class="card-description">Monitor and control content crawling operations</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="active-crawls">-</div>
+                            <div class="stat-label">Active Crawls</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="scheduled-jobs">-</div>
+                            <div class="stat-label">Scheduled Jobs</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="/crawl-dashboard.html" class="btn btn-primary">
+                        📊 Open Crawl Dashboard
+                    </a>
+                    <a href="/api/flows/status" class="btn btn-secondary" target="_blank">
+                        📈 View API Status
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content Labeling -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🏷️</div>
+                    <div>
+                        <div class="card-title">Content Labeling</div>
+                        <div class="card-description">AI-powered content evaluation and labeling</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-content">-</div>
+                            <div class="stat-label">Total Content</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="labeled-items">-</div>
+                            <div class="stat-label">Labeled Items</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="/admin-table.html" class="btn btn-primary">
+                        📊 Table Interface
+                    </a>
+                    <a href="/admin-simple.html" class="btn btn-secondary">
+                        📝 Simple Interface
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cluster Management -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🖥️</div>
+                    <div>
+                        <div class="card-title">Cluster Management</div>
+                        <div class="card-description">Monitor and manage processing clusters</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="cluster-nodes">-</div>
+                            <div class="stat-label">Active Nodes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="cluster-health">-</div>
+                            <div class="stat-label">Health Score</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-primary" onclick="openClusterManager()">
+                        🖥️ Manage Clusters
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewClusterLogs()">
+                        📄 View Logs
+                    </button>
+                </div>
+            </div>
+
+            <!-- System Operations -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <div>
+                        <div class="card-title">System Operations</div>
+                        <div class="card-description">Database cleanup and system maintenance</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="database-size">-</div>
+                            <div class="stat-label">DB Size</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="last-cleanup">-</div>
+                            <div class="stat-label">Last Cleanup</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-warning" onclick="runCleanup()">
+                        🧹 Run Cleanup
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewSystemStats()">
+                        📊 System Stats
+                    </button>
+                </div>
+            </div>
+
+            <!-- Areas Management -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🌍</div>
+                    <div>
+                        <div class="card-title">Areas Management</div>
+                        <div class="card-description">Manage geographic areas and configurations</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-areas">-</div>
+                            <div class="stat-label">Total Areas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="enabled-areas">-</div>
+                            <div class="stat-label">Enabled</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-primary" onclick="manageAreas()">
+                        🌍 Manage Areas
+                    </button>
+                    <button class="btn btn-secondary" onclick="syncAreas()">
+                        🔄 Sync Areas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trending & Analytics -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📈</div>
+                    <div>
+                        <div class="card-title">Trending & Analytics</div>
+                        <div class="card-description">Content analytics and trending generation</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="trending-items">-</div>
+                            <div class="stat-label">Trending Items</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="analytics-score">-</div>
+                            <div class="stat-label">Quality Score</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-success" onclick="generateTrending()">
+                        🔥 Generate Trending
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewAnalytics()">
+                        📊 View Analytics
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="quick-actions">
+            <h3>🚀 Quick Actions</h3>
+            <div class="actions-grid">
+                <button class="btn btn-primary" onclick="executeQuickCrawl()">
+                    ⚡ Quick Crawl
+                </button>
+                <button class="btn btn-secondary" onclick="scheduleJob()">
+                    📅 Schedule Job
+                </button>
+                <button class="btn btn-success" onclick="runHealthCheck()">
+                    🩺 Health Check
+                </button>
+                <button class="btn btn-warning" onclick="viewLogs()">
+                    📄 View Logs
+                </button>
+                <button class="btn btn-secondary" onclick="exportData()">
+                    💾 Export Data
+                </button>
+                <button class="btn btn-secondary" onclick="viewDocumentation()">
+                    📚 Documentation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Pulse Flows Admin Dashboard • Built with Claude Code • Last updated: <span id="last-updated">Loading...</span></p>
+    </footer>
+
+    <script>
+        // Dashboard state
+        let dashboardData = {
+            activeCrawls: 0,
+            scheduledJobs: 0,
+            totalContent: 0,
+            labeledItems: 0,
+            clusterNodes: 0,
+            clusterHealth: 100,
+            totalAreas: 0,
+            enabledAreas: 0,
+            trendingItems: 0,
+            analyticsScore: 0
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            updateLastUpdated();
+            startAutoRefresh();
+        });
+
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadCrawlStats(),
+                    loadContentStats(),
+                    loadClusterStats(),
+                    loadAreasStats(),
+                    loadTrendingStats()
+                ]);
+                
+                updateDashboard();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                document.getElementById('server-status').textContent = 'Connection Error';
+            }
+        }
+
+        async function loadCrawlStats() {
+            try {
+                const [statusResponse, jobsResponse] = await Promise.all([
+                    fetch('/api/flows/monitor/status'),
+                    fetch('/api/flows/schedule/jobs/upcoming')
+                ]);
+
+                if (statusResponse.ok) {
+                    const statusData = await statusResponse.json();
+                    dashboardData.activeCrawls = statusData.totalRunning || 0;
+                }
+
+                if (jobsResponse.ok) {
+                    const jobsData = await jobsResponse.json();
+                    dashboardData.scheduledJobs = jobsData.total || 0;
+                }
+            } catch (error) {
+                console.error('Error loading crawl stats:', error);
+            }
+        }
+
+        async function loadContentStats() {
+            try {
+                // Mock data for now - replace with actual API calls
+                dashboardData.totalContent = Math.floor(Math.random() * 10000) + 5000;
+                dashboardData.labeledItems = Math.floor(dashboardData.totalContent * 0.3);
+            } catch (error) {
+                console.error('Error loading content stats:', error);
+            }
+        }
+
+        async function loadClusterStats() {
+            try {
+                // Mock data for cluster stats
+                dashboardData.clusterNodes = Math.floor(Math.random() * 5) + 1;
+                dashboardData.clusterHealth = Math.floor(Math.random() * 20) + 80;
+            } catch (error) {
+                console.error('Error loading cluster stats:', error);
+            }
+        }
+
+        async function loadAreasStats() {
+            try {
+                const response = await fetch('/api/flows/areas/stats');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.stats) {
+                        dashboardData.enabledAreas = data.stats.enabled || 0;
+                        dashboardData.totalAreas = data.stats.total || 0;
+                    }
+                } else {
+                    // Fallback to areas endpoint
+                    const areasResponse = await fetch('/api/flows/areas');
+                    if (areasResponse.ok) {
+                        const areasData = await areasResponse.json();
+                        if (areasData.success && areasData.areas) {
+                            dashboardData.totalAreas = areasData.count || areasData.areas.length;
+                            dashboardData.enabledAreas = areasData.areas.filter(area => area.enabled !== false).length;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading areas stats:', error);
+                // Keep the existing values as fallback
+            }
+        }
+
+        async function loadTrendingStats() {
+            try {
+                // Mock data for trending stats
+                dashboardData.trendingItems = Math.floor(Math.random() * 500) + 100;
+                dashboardData.analyticsScore = Math.floor(Math.random() * 20) + 75;
+            } catch (error) {
+                console.error('Error loading trending stats:', error);
+            }
+        }
+
+        function updateDashboard() {
+            document.getElementById('active-crawls').textContent = dashboardData.activeCrawls;
+            document.getElementById('scheduled-jobs').textContent = dashboardData.scheduledJobs;
+            document.getElementById('total-content').textContent = dashboardData.totalContent.toLocaleString();
+            document.getElementById('labeled-items').textContent = dashboardData.labeledItems.toLocaleString();
+            document.getElementById('cluster-nodes').textContent = dashboardData.clusterNodes;
+            document.getElementById('cluster-health').textContent = dashboardData.clusterHealth + '%';
+            document.getElementById('total-areas').textContent = dashboardData.totalAreas;
+            document.getElementById('enabled-areas').textContent = dashboardData.enabledAreas;
+            document.getElementById('trending-items').textContent = dashboardData.trendingItems.toLocaleString();
+            document.getElementById('analytics-score').textContent = dashboardData.analyticsScore + '%';
+        }
+
+        function updateLastUpdated() {
+            document.getElementById('last-updated').textContent = new Date().toLocaleString();
+        }
+
+        function startAutoRefresh() {
+            setInterval(() => {
+                loadDashboardData();
+                updateLastUpdated();
+            }, 30000); // Refresh every 30 seconds
+        }
+
+        // Action handlers
+        function openClusterManager() {
+            // For now, open a simple cluster info modal
+            alert('Cluster Management\n\nActive Nodes: ' + dashboardData.clusterNodes + '\nHealth: ' + dashboardData.clusterHealth + '%\n\nFull cluster management interface coming soon!');
+        }
+
+        function viewClusterLogs() {
+            window.open('/api/flows/monitor/logs', '_blank');
+        }
+
+        async function runCleanup() {
+            if (!confirm('Are you sure you want to run system cleanup? This will remove old content and logs.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/flows/cleanup', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Cleanup completed successfully!');
+                    loadDashboardData(); // Refresh stats
+                } else {
+                    alert('Cleanup failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Cleanup failed: ' + error.message);
+            }
+        }
+
+        function viewSystemStats() {
+            window.open('/api/flows/status', '_blank');
+        }
+
+        async function manageAreas() {
+            try {
+                const response = await fetch('/api/flows/areas');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.areas) {
+                        // Create a simple areas management modal
+                        const enabledCount = data.areas.filter(area => area.enabled !== false).length;
+                        const disabledCount = data.areas.length - enabledCount;
+                        
+                        const areasList = data.areas
+                            .slice(0, 10) // Show first 10 areas
+                            .map(area => `${area.area || area.id} (${area.enabled !== false ? 'Enabled' : 'Disabled'})`)
+                            .join('\\n');
+                        
+                        alert(`Areas Management\\n\\nTotal Areas: ${data.areas.length}\\nEnabled: ${enabledCount}\\nDisabled: ${disabledCount}\\n\\nFirst 10 Areas:\\n${areasList}\\n\\nFor detailed management, use:\\nGET /api/flows/areas\\nPATCH /api/flows/areas/:id/enable`);
+                    }
+                } else {
+                    window.open('/api/flows/areas', '_blank');
+                }
+            } catch (error) {
+                console.error('Error loading areas:', error);
+                window.open('/api/flows/areas', '_blank');
+            }
+        }
+
+        async function syncAreas() {
+            if (!confirm('Are you sure you want to sync areas? This will update area data from configuration files.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/flows/areas/sync', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const message = data.results ? 
+                        `Areas synced successfully!\\n\\nResults: ${JSON.stringify(data.results, null, 2)}` :
+                        'Areas synced successfully!';
+                    alert(message);
+                    loadAreasStats(); // Refresh the stats
+                } else {
+                    alert('Sync failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+                alert('Sync failed: ' + error.message);
+            }
+        }
+
+        async function generateTrending() {
+            try {
+                const response = await fetch('/api/flows/trending/generate', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Trending generation started!');
+                    loadTrendingStats();
+                } else {
+                    alert('Generation failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Generation failed: ' + error.message);
+            }
+        }
+
+        function viewAnalytics() {
+            window.open('/api/flows/admin/labels/stats', '_blank');
+        }
+
+        function executeQuickCrawl() {
+            window.location.href = '/crawl-dashboard.html';
+        }
+
+        function scheduleJob() {
+            window.location.href = '/crawl-dashboard.html';
+        }
+
+        async function runHealthCheck() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    alert('✅ System Health Check Passed\n\nAll services are running normally.');
+                } else {
+                    alert('⚠️ Health Check Issues Detected\n\nPlease check system logs.');
+                }
+            } catch (error) {
+                alert('❌ Health Check Failed\n\nUnable to connect to server.');
+            }
+        }
+
+        function viewLogs() {
+            window.location.href = '/crawl-dashboard.html';
+        }
+
+        function exportData() {
+            alert('Data Export\n\nExport functionality will be available soon.\nContact admin for manual exports.');
+        }
+
+        function viewDocumentation() {
+            alert('Documentation\n\nDetailed documentation is available in the CLAUDE.md file\nin the project repository.');
+        }
+    </script>
+</body>
+</html>
