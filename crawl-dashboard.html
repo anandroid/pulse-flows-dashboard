@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse Flows - Crawl Dashboard</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-running {
+            background: #10b981;
+        }
+        
+        .status-idle {
+            background: #6b7280;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .crawl-item {
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .crawl-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .crawl-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .crawl-areas {
+            font-weight: 600;
+            color: #667eea;
+            flex: 1;
+        }
+        
+        .crawl-time {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .progress-bar {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 6px;
+            height: 6px;
+            margin: 0.75rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        .crawl-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .log-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(4px);
+        }
+        
+        .log-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .log-area {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 80px;
+        }
+        
+        .log-time {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .log-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .log-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+        
+        .status-failed {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        
+        .status-running {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+        
+        .log-size {
+            color: #9ca3af;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .log-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .log-viewer-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1000px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .log-viewer-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .log-viewer-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .log-content {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .close-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .refresh-indicator {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .area-filter {
+            margin-bottom: 1rem;
+        }
+        
+        .area-filter select {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            background: white;
+            color: #667eea;
+            font-size: 0.875rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .area-filter select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .modal-content.large {
+            max-width: 800px;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .area-selection {
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            background: #f9fafb;
+        }
+        
+        .area-search {
+            margin-bottom: 1rem;
+        }
+        
+        .area-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            min-height: 2rem;
+        }
+        
+        .area-chip {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .area-chip .remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .area-list {
+            max-height: 200px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .area-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .area-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .area-item input {
+            margin: 0;
+            width: auto;
+        }
+        
+        .area-item label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 0.875rem;
+            flex: 1;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .jobs-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .jobs-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .job-item {
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .job-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .job-name {
+            font-weight: 600;
+            color: #667eea;
+            flex: 1;
+        }
+        
+        .job-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .job-areas {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .job-time {
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+        
+        .job-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .job-action-btn {
+            padding: 0.25rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .job-action-btn.cancel {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .job-action-btn.cancel:hover {
+            background: #fecaca;
+        }
+        
+        .job-action-btn.view-log {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .job-action-btn.view-log:hover {
+            background: #c7d2fe;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .log-viewer, .modal {
+                padding: 1rem;
+            }
+            
+            .modal-content {
+                max-width: 100%;
+                margin: 1rem;
+            }
+            
+            .area-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>
+                🚀 Pulse Flows Dashboard
+                <span class="status-indicator" id="main-status"></span>
+            </h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    <span id="refresh-icon">🔄</span>
+                    Refresh
+                </button>
+                <a href="/admin-table.html" class="btn btn-primary">
+                    📊 Admin Panel
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <!-- Running Crawls Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        🏃 Running Crawls
+                        <span class="status-indicator status-idle" id="crawl-status"></span>
+                    </h2>
+                    <span id="crawl-count">0 active</span>
+                </div>
+                <div id="running-crawls">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😴</div>
+                        <p>No crawls currently running</p>
+                        <small>Start a crawl to see progress here</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        🚀 Quick Actions
+                    </h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="showScheduleModal()">
+                        📅 Schedule Crawl
+                    </button>
+                    <button class="btn btn-secondary" onclick="showExecuteModal()">
+                        ⚡ Execute Now
+                    </button>
+                    <button class="btn btn-secondary" onclick="showScheduledJobs()">
+                        📋 View Schedules
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Scheduled Jobs Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        📅 Upcoming Jobs
+                    </h2>
+                    <span id="upcoming-count">0 scheduled</span>
+                </div>
+                <div id="upcoming-jobs">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>No upcoming jobs</p>
+                        <small>Schedule a crawl to see it here</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Logs Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        📄 Recent Logs
+                    </h2>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="viewLiveServerLog()" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+                            📡 Live Server Log
+                        </button>
+                        <div class="area-filter">
+                            <select id="area-filter" onchange="filterLogs()">
+                                <option value="">All Areas</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="recent-logs">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>Loading logs...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Viewer Modal -->
+    <div class="log-viewer" id="log-viewer">
+        <div class="log-viewer-content">
+            <div class="log-viewer-header">
+                <h3 id="log-viewer-title">Log Viewer</h3>
+                <button class="close-btn" onclick="closeLogViewer()">✕</button>
+            </div>
+            <div class="log-viewer-body">
+                <div class="log-content" id="log-content">
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal" id="schedule-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📅 Schedule Crawl</h3>
+                <button class="close-btn" onclick="closeScheduleModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Job Name</label>
+                    <input type="text" id="schedule-name" placeholder="e.g. Weekend crawl for major cities">
+                </div>
+                
+                <div class="form-group">
+                    <label>Areas to Crawl</label>
+                    <div class="area-selection">
+                        <div class="area-search">
+                            <input type="text" id="area-search" placeholder="Search areas...">
+                        </div>
+                        <div class="area-chips" id="selected-areas">
+                            <!-- Selected areas will appear here -->
+                        </div>
+                        <div class="area-list" id="area-list">
+                            <!-- Area checkboxes will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Scheduled Date & Time</label>
+                    <input type="datetime-local" id="schedule-datetime">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="schedule-recurring">
+                        Recurring Schedule
+                    </label>
+                    <select id="schedule-interval" style="display: none;">
+                        <option value="hourly">Every Hour</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="scheduleJob()">Schedule Job</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Execute Modal -->
+    <div class="modal" id="execute-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚡ Execute Crawl Now</h3>
+                <button class="close-btn" onclick="closeExecuteModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Areas to Crawl</label>
+                    <div class="area-selection">
+                        <div class="area-search">
+                            <input type="text" id="execute-area-search" placeholder="Search areas...">
+                        </div>
+                        <div class="area-chips" id="execute-selected-areas">
+                            <!-- Selected areas will appear here -->
+                        </div>
+                        <div class="area-list" id="execute-area-list">
+                            <!-- Area checkboxes will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="closeExecuteModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="executeJob()">Execute Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scheduled Jobs Modal -->
+    <div class="modal" id="jobs-modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>📋 Scheduled Jobs</h3>
+                <button class="close-btn" onclick="closeJobsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="jobs-filters">
+                    <button class="filter-btn active" data-filter="all">All Jobs</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="running">Running</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                    <button class="filter-btn" data-filter="failed">Failed</button>
+                </div>
+                <div class="jobs-list" id="jobs-list">
+                    <!-- Jobs will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        let currentAreaFilter = '';
+        
+        // Global variables
+        let availableAreas = [];
+        let selectedAreas = [];
+        let selectedExecuteAreas = [];
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            loadAreas();
+            startAutoRefresh();
+        });
+        
+        async function loadData() {
+            await Promise.all([
+                loadCrawlStatus(),
+                loadLogs(),
+                loadUpcomingJobs()
+            ]);
+        }
+        
+        async function loadCrawlStatus() {
+            try {
+                const response = await fetch('/api/flows/monitor/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderCrawlStatus(data);
+                } else {
+                    console.error('Failed to load crawl status:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading crawl status:', error);
+            }
+        }
+        
+        async function loadLogs() {
+            try {
+                const url = currentAreaFilter 
+                    ? `/api/flows/monitor/logs?area=${currentAreaFilter}`
+                    : '/api/flows/monitor/logs';
+                    
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderLogs(data.logs);
+                    updateAreaFilter(data.logs);
+                } else {
+                    console.error('Failed to load logs:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+        
+        function renderCrawlStatus(data) {
+            const crawlsContainer = document.getElementById('running-crawls');
+            const crawlCount = document.getElementById('crawl-count');
+            const crawlStatus = document.getElementById('crawl-status');
+            const mainStatus = document.getElementById('main-status');
+            
+            const runningCount = data.totalRunning || 0;
+            crawlCount.textContent = `${runningCount} active`;
+            
+            if (runningCount > 0) {
+                crawlStatus.className = 'status-indicator status-running';
+                mainStatus.className = 'status-indicator status-running';
+                
+                crawlsContainer.innerHTML = '';
+                
+                Object.entries(data.crawls).forEach(([crawlId, crawl]) => {
+                    const crawlElement = createCrawlElement(crawlId, crawl);
+                    crawlsContainer.appendChild(crawlElement);
+                });
+            } else {
+                crawlStatus.className = 'status-indicator status-idle';
+                mainStatus.className = 'status-indicator status-idle';
+                
+                crawlsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😴</div>
+                        <p>No crawls currently running</p>
+                        <small>Start a crawl to see progress here</small>
+                    </div>
+                `;
+            }
+        }
+        
+        function createCrawlElement(crawlId, crawl) {
+            const element = document.createElement('div');
+            element.className = 'crawl-item';
+            
+            const progress = crawl.progress || {};
+            const progressPercent = progress.totalAreas > 0 
+                ? (progress.completedAreas / progress.totalAreas) * 100 
+                : 0;
+            
+            const areasText = crawl.areas.length > 3 
+                ? `${crawl.areas.slice(0, 3).join(', ')} +${crawl.areas.length - 3} more`
+                : crawl.areas.join(', ');
+            
+            const currentStatus = crawl.currentArea && crawl.currentConfig
+                ? `${crawl.currentArea} → ${crawl.currentConfig}`
+                : crawl.currentArea
+                ? `Processing ${crawl.currentArea}`
+                : 'Starting...';
+            
+            const startTime = new Date(crawl.startTime).toLocaleTimeString();
+            
+            element.innerHTML = `
+                <div class="crawl-header">
+                    <div class="crawl-areas">${areasText}</div>
+                    <div class="crawl-time">Started ${startTime}</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                </div>
+                <div class="crawl-details">
+                    <span>${currentStatus}</span>
+                    <span>${progress.completedAreas || 0}/${progress.totalAreas || 0} areas</span>
+                </div>
+            `;
+            
+            return element;
+        }
+        
+        function renderLogs(logs) {
+            const logsContainer = document.getElementById('recent-logs');
+            
+            if (logs.length === 0) {
+                logsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No logs found</p>
+                        <small>Run a crawl to generate logs</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            logsContainer.innerHTML = '';
+            
+            logs.slice(0, 10).forEach(log => {
+                const logElement = createLogElement(log);
+                logsContainer.appendChild(logElement);
+            });
+        }
+        
+        function createLogElement(log) {
+            const element = document.createElement('div');
+            element.className = 'log-item';
+            element.onclick = () => viewLog(log.filename);
+            
+            const timestamp = log.timestamp ? formatTimestamp(log.timestamp) : 'Unknown time';
+            const area = log.area === 'unknown' ? 'Multiple' : log.area.charAt(0).toUpperCase() + log.area.slice(1);
+            
+            element.innerHTML = `
+                <div class="log-info">
+                    <div class="log-area">${area}</div>
+                    <div class="log-time">${timestamp}</div>
+                </div>
+                <div class="log-meta">
+                    <span class="log-status status-${log.status}">${log.status}</span>
+                    <span class="log-size">${log.size}</span>
+                </div>
+            `;
+            
+            return element;
+        }
+        
+        function updateAreaFilter(logs) {
+            const filterSelect = document.getElementById('area-filter');
+            const areas = new Set();
+            
+            logs.forEach(log => {
+                if (log.area && log.area !== 'unknown') {
+                    areas.add(log.area);
+                }
+            });
+            
+            const currentValue = filterSelect.value;
+            filterSelect.innerHTML = '<option value="">All Areas</option>';
+            
+            Array.from(areas).sort().forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area.charAt(0).toUpperCase() + area.slice(1);
+                filterSelect.appendChild(option);
+            });
+            
+            filterSelect.value = currentValue;
+        }
+        
+        let logUpdateInterval = null;
+        let isLiveLogActive = false;
+
+        async function viewLog(filename, isLive = false) {
+            const viewer = document.getElementById('log-viewer');
+            const title = document.getElementById('log-viewer-title');
+            const content = document.getElementById('log-content');
+            
+            // Clear any existing interval
+            if (logUpdateInterval) {
+                clearInterval(logUpdateInterval);
+                logUpdateInterval = null;
+            }
+            
+            isLiveLogActive = isLive;
+            
+            // Update title with live indicator
+            if (isLive) {
+                title.innerHTML = `📡 Live Log: ${filename} <span style="color: #10b981; font-size: 0.8em;">[LIVE]</span>`;
+            } else {
+                title.textContent = `Log: ${filename}`;
+            }
+            
+            content.textContent = 'Loading...';
+            viewer.style.display = 'flex';
+            
+            await loadLogContent(filename, isLive);
+            
+            // Set up live updates for server.log
+            if (isLive && filename === 'server.log') {
+                logUpdateInterval = setInterval(() => {
+                    loadLogContent(filename, true);
+                }, 2000); // Update every 2 seconds
+            }
+        }
+        
+        async function loadLogContent(filename, isLive = false) {
+            const content = document.getElementById('log-content');
+            
+            try {
+                let url;
+                if (isLive && filename === 'server.log') {
+                    url = '/api/flows/monitor/logs/live/server?tail=200';
+                } else {
+                    url = `/api/flows/monitor/logs/${filename}?tail=200`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Format the content with timestamps if live
+                    let formattedContent = data.content;
+                    if (isLive && data.timestamp) {
+                        formattedContent = `=== Last Updated: ${new Date(data.timestamp).toLocaleTimeString()} ===\n\n${formattedContent}`;
+                    }
+                    
+                    // Auto-scroll to bottom for live logs
+                    const shouldScroll = isLive && (content.scrollTop + content.clientHeight >= content.scrollHeight - 100);
+                    
+                    content.textContent = formattedContent;
+                    
+                    if (shouldScroll) {
+                        content.scrollTop = content.scrollHeight;
+                    }
+                } else {
+                    content.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                content.textContent = `Error loading log: ${error.message}`;
+            }
+        }
+        
+        function closeLogViewer() {
+            // Clear live updates
+            if (logUpdateInterval) {
+                clearInterval(logUpdateInterval);
+                logUpdateInterval = null;
+            }
+            isLiveLogActive = false;
+            
+            document.getElementById('log-viewer').style.display = 'none';
+        }
+        
+        // Enhanced function to view live server logs
+        function viewLiveServerLog() {
+            viewLog('server.log', true);
+        }
+        
+        function filterLogs() {
+            const select = document.getElementById('area-filter');
+            currentAreaFilter = select.value;
+            loadLogs();
+        }
+        
+        function refreshData() {
+            const icon = document.getElementById('refresh-icon');
+            icon.className = 'refresh-indicator';
+            
+            loadData().then(() => {
+                setTimeout(() => {
+                    icon.className = '';
+                    icon.textContent = '🔄';
+                }, 500);
+            });
+        }
+        
+        function startAutoRefresh() {
+            refreshInterval = setInterval(loadData, 5000); // Refresh every 5 seconds
+        }
+        
+        function formatTimestamp(timestamp) {
+            // timestamp format: YYYYMMDD_HHMMSS
+            if (timestamp.length !== 15) return timestamp;
+            
+            const year = timestamp.substr(0, 4);
+            const month = timestamp.substr(4, 2);
+            const day = timestamp.substr(6, 2);
+            const hour = timestamp.substr(9, 2);
+            const minute = timestamp.substr(11, 2);
+            const second = timestamp.substr(13, 2);
+            
+            const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+            return date.toLocaleString();
+        }
+        
+        // Close log viewer on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLogViewer();
+            }
+        });
+        
+        // Close log viewer on backdrop click
+        document.getElementById('log-viewer').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLogViewer();
+            }
+        });
+
+        // === SCHEDULER FUNCTIONS ===
+
+        async function loadAreas() {
+            try {
+                const response = await fetch('/api/flows/schedule/areas');
+                const data = await response.json();
+                
+                if (data.success) {
+                    availableAreas = data.areas;
+                    renderAreaLists();
+                }
+            } catch (error) {
+                console.error('Error loading areas:', error);
+            }
+        }
+
+        async function loadUpcomingJobs() {
+            try {
+                const response = await fetch('/api/flows/schedule/jobs/upcoming');
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderUpcomingJobs(data.jobs);
+                } else {
+                    console.error('Failed to load upcoming jobs:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading upcoming jobs:', error);
+            }
+        }
+
+        function renderUpcomingJobs(jobs) {
+            const container = document.getElementById('upcoming-jobs');
+            const count = document.getElementById('upcoming-count');
+            
+            count.textContent = `${jobs.length} scheduled`;
+            
+            if (jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>No upcoming jobs</p>
+                        <small>Schedule a crawl to see it here</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            jobs.slice(0, 5).forEach(job => {
+                const jobElement = createJobElement(job, true);
+                container.appendChild(jobElement);
+            });
+        }
+
+        function createJobElement(job, isUpcoming = false) {
+            const element = document.createElement('div');
+            element.className = 'crawl-item';
+            
+            const scheduledTime = new Date(job.scheduledAt).toLocaleString();
+            const areasText = job.areas.length > 3 
+                ? `${job.areas.slice(0, 3).join(', ')} +${job.areas.length - 3} more`
+                : job.areas.join(', ');
+            
+            const statusClass = job.status === 'running' ? 'status-running' : 
+                               job.status === 'completed' ? 'status-completed' : 
+                               job.status === 'failed' ? 'status-failed' : 'status-idle';
+            
+            const timeLabel = isUpcoming ? 'Scheduled for' : 
+                             job.status === 'running' ? 'Started' : 
+                             job.status === 'completed' ? 'Completed' :
+                             job.status === 'failed' ? 'Failed' : 'Scheduled';
+            
+            element.innerHTML = `
+                <div class="crawl-header">
+                    <div class="crawl-areas">${job.name}</div>
+                    <span class="job-status ${statusClass}">${job.status}</span>
+                </div>
+                <div class="crawl-details">
+                    <span>${areasText}</span>
+                    <span>${timeLabel}: ${scheduledTime}</span>
+                </div>
+                ${job.status === 'pending' && isUpcoming ? `
+                    <div class="job-actions" style="margin-top: 0.5rem;">
+                        <button class="job-action-btn cancel" onclick="cancelJob('${job.id}')">Cancel</button>
+                    </div>
+                ` : ''}
+            `;
+            
+            return element;
+        }
+
+        function renderAreaLists() {
+            renderAreaList('area-list', 'schedule');
+            renderAreaList('execute-area-list', 'execute');
+        }
+
+        function renderAreaList(containerId, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            availableAreas.forEach(area => {
+                const item = document.createElement('div');
+                item.className = 'area-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `${type}-${area.id}`;
+                checkbox.value = area.id;
+                checkbox.onchange = () => toggleArea(area, type);
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = `${area.name}, ${area.region}`;
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                container.appendChild(item);
+            });
+        }
+
+        function toggleArea(area, type) {
+            const checkbox = document.getElementById(`${type}-${area.id}`);
+            const selectedList = type === 'schedule' ? selectedAreas : selectedExecuteAreas;
+            const chipsContainer = type === 'schedule' ? 'selected-areas' : 'execute-selected-areas';
+            
+            if (checkbox.checked) {
+                if (!selectedList.find(a => a.id === area.id)) {
+                    selectedList.push(area);
+                }
+            } else {
+                const index = selectedList.findIndex(a => a.id === area.id);
+                if (index > -1) {
+                    selectedList.splice(index, 1);
+                }
+            }
+            
+            renderSelectedAreas(chipsContainer, selectedList, type);
+        }
+
+        function renderSelectedAreas(containerId, areas, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            areas.forEach(area => {
+                const chip = document.createElement('div');
+                chip.className = 'area-chip';
+                chip.innerHTML = `
+                    ${area.name}
+                    <span class="remove" onclick="removeArea('${area.id}', '${type}')">×</span>
+                `;
+                container.appendChild(chip);
+            });
+        }
+
+        function removeArea(areaId, type) {
+            const selectedList = type === 'schedule' ? selectedAreas : selectedExecuteAreas;
+            const chipsContainer = type === 'schedule' ? 'selected-areas' : 'execute-selected-areas';
+            
+            const index = selectedList.findIndex(a => a.id === areaId);
+            if (index > -1) {
+                selectedList.splice(index, 1);
+            }
+            
+            // Uncheck the checkbox
+            const checkbox = document.getElementById(`${type}-${areaId}`);
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+            
+            renderSelectedAreas(chipsContainer, selectedList, type);
+        }
+
+        function filterAreas(searchTerm, type) {
+            const listContainer = type === 'schedule' ? 'area-list' : 'execute-area-list';
+            const items = document.getElementById(listContainer).querySelectorAll('.area-item');
+            
+            items.forEach(item => {
+                const label = item.querySelector('label').textContent.toLowerCase();
+                const matches = label.includes(searchTerm.toLowerCase());
+                item.style.display = matches ? 'flex' : 'none';
+            });
+        }
+
+        // Modal functions
+        function showScheduleModal() {
+            document.getElementById('schedule-modal').style.display = 'flex';
+            
+            // Set minimum datetime to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 5); // 5 minutes from now
+            document.getElementById('schedule-datetime').min = now.toISOString().slice(0, 16);
+            
+            // Set default datetime to 1 hour from now
+            const defaultTime = new Date(now.getTime() + 60 * 60 * 1000);
+            document.getElementById('schedule-datetime').value = defaultTime.toISOString().slice(0, 16);
+        }
+
+        function closeScheduleModal() {
+            document.getElementById('schedule-modal').style.display = 'none';
+            resetScheduleForm();
+        }
+
+        function showExecuteModal() {
+            document.getElementById('execute-modal').style.display = 'flex';
+        }
+
+        function closeExecuteModal() {
+            document.getElementById('execute-modal').style.display = 'none';
+            resetExecuteForm();
+        }
+
+        function showScheduledJobs() {
+            document.getElementById('jobs-modal').style.display = 'flex';
+            loadAllJobs();
+        }
+
+        function closeJobsModal() {
+            document.getElementById('jobs-modal').style.display = 'none';
+        }
+
+        function resetScheduleForm() {
+            document.getElementById('schedule-name').value = '';
+            document.getElementById('schedule-datetime').value = '';
+            document.getElementById('schedule-recurring').checked = false;
+            document.getElementById('schedule-interval').style.display = 'none';
+            selectedAreas.length = 0;
+            renderSelectedAreas('selected-areas', selectedAreas, 'schedule');
+            
+            // Uncheck all area checkboxes
+            document.querySelectorAll('#area-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
+        function resetExecuteForm() {
+            selectedExecuteAreas.length = 0;
+            renderSelectedAreas('execute-selected-areas', selectedExecuteAreas, 'execute');
+            
+            // Uncheck all area checkboxes
+            document.querySelectorAll('#execute-area-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
+        async function scheduleJob() {
+            const name = document.getElementById('schedule-name').value.trim();
+            const datetime = document.getElementById('schedule-datetime').value;
+            const recurring = document.getElementById('schedule-recurring').checked;
+            const interval = document.getElementById('schedule-interval').value;
+            
+            if (!name) {
+                alert('Please enter a job name');
+                return;
+            }
+            
+            if (selectedAreas.length === 0) {
+                alert('Please select at least one area');
+                return;
+            }
+            
+            if (!datetime) {
+                alert('Please select a date and time');
+                return;
+            }
+            
+            const scheduledAt = new Date(datetime);
+            if (scheduledAt <= new Date()) {
+                alert('Scheduled time must be in the future');
+                return;
+            }
+            
+            const jobData = {
+                name,
+                areas: selectedAreas.map(a => a.id),
+                scheduledAt: scheduledAt.toISOString()
+            };
+            
+            if (recurring) {
+                jobData.recurring = { interval };
+            }
+            
+            try {
+                const response = await fetch('/api/flows/schedule/jobs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jobData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Job scheduled successfully! ID: ${data.jobId}`);
+                    closeScheduleModal();
+                    loadUpcomingJobs();
+                } else {
+                    alert('Failed to schedule job: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error scheduling job:', error);
+                alert('Failed to schedule job: ' + error.message);
+            }
+        }
+
+        async function executeJob() {
+            if (selectedExecuteAreas.length === 0) {
+                alert('Please select at least one area');
+                return;
+            }
+            
+            const areas = selectedExecuteAreas.map(a => a.id);
+            const name = `Manual crawl - ${selectedExecuteAreas.map(a => a.name).join(', ')}`;
+            
+            try {
+                const response = await fetch('/api/flows/schedule/jobs/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ areas, name })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Crawl started for: ${data.areas.join(', ')}`);
+                    closeExecuteModal();
+                    loadData(); // Refresh all data
+                } else {
+                    alert('Failed to start crawl: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error executing job:', error);
+                alert('Failed to start crawl: ' + error.message);
+            }
+        }
+
+        async function cancelJob(jobId) {
+            if (!confirm('Are you sure you want to cancel this job?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/flows/schedule/jobs/${jobId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Job cancelled successfully');
+                    loadUpcomingJobs();
+                    loadAllJobs(); // Refresh jobs modal if open
+                } else {
+                    alert('Failed to cancel job: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error cancelling job:', error);
+                alert('Failed to cancel job: ' + error.message);
+            }
+        }
+
+        async function loadAllJobs() {
+            try {
+                const response = await fetch('/api/flows/schedule/jobs');
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderAllJobs(data.jobs);
+                } else {
+                    console.error('Failed to load jobs:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+            }
+        }
+
+        function renderAllJobs(jobs) {
+            const container = document.getElementById('jobs-list');
+            
+            if (jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No scheduled jobs</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            jobs.forEach(job => {
+                const jobElement = createDetailedJobElement(job);
+                container.appendChild(jobElement);
+            });
+        }
+
+        function createDetailedJobElement(job) {
+            const element = document.createElement('div');
+            element.className = 'job-item';
+            
+            const scheduledTime = new Date(job.scheduledAt).toLocaleString();
+            const createdTime = new Date(job.createdAt).toLocaleString();
+            
+            const statusClass = job.status === 'running' ? 'status-running' : 
+                               job.status === 'completed' ? 'status-completed' : 
+                               job.status === 'failed' ? 'status-failed' : 
+                               job.status === 'cancelled' ? 'status-failed' : 'status-idle';
+            
+            let actionButtons = '';
+            if (job.status === 'pending') {
+                actionButtons = `<button class="job-action-btn cancel" onclick="cancelJob('${job.id}')">Cancel</button>`;
+            }
+            if (job.logFile) {
+                actionButtons += `<button class="job-action-btn view-log" onclick="viewJobLog('${job.logFile}')">View Log</button>`;
+            }
+            
+            element.innerHTML = `
+                <div class="job-header">
+                    <div class="job-name">${job.name}</div>
+                    <span class="job-status ${statusClass}">${job.status}</span>
+                </div>
+                <div class="job-areas">Areas: ${job.areas.join(', ')}</div>
+                <div class="job-time">
+                    Scheduled: ${scheduledTime} | Created: ${createdTime}
+                    ${job.executedAt ? ` | Executed: ${new Date(job.executedAt).toLocaleString()}` : ''}
+                </div>
+                ${actionButtons ? `<div class="job-actions">${actionButtons}</div>` : ''}
+            `;
+            
+            return element;
+        }
+
+        function viewJobLog(logFile) {
+            // Use the existing log viewer
+            viewLog(logFile);
+            closeJobsModal();
+        }
+
+        // Search functionality
+        document.getElementById('area-search').addEventListener('input', function(e) {
+            filterAreas(e.target.value, 'schedule');
+        });
+
+        document.getElementById('execute-area-search').addEventListener('input', function(e) {
+            filterAreas(e.target.value, 'execute');
+        });
+
+        // Recurring checkbox handler
+        document.getElementById('schedule-recurring').addEventListener('change', function(e) {
+            const intervalSelect = document.getElementById('schedule-interval');
+            intervalSelect.style.display = e.target.checked ? 'block' : 'none';
+        });
+
+        // Job filter buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('filter-btn')) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const filter = e.target.dataset.filter;
+                filterJobsList(filter);
+            }
+        });
+
+        function filterJobsList(filter) {
+            const jobs = document.querySelectorAll('.job-item');
+            
+            jobs.forEach(job => {
+                const status = job.querySelector('.job-status').textContent.trim();
+                
+                if (filter === 'all' || status === filter) {
+                    job.style.display = 'block';
+                } else {
+                    job.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
