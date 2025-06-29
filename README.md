@@ -14,6 +14,7 @@ This repository contains the web-based dashboard interfaces for managing and mon
 - Real-time statistics and quick actions
 
 ### Specialized Interfaces
+- **model-evaluation-dashboard.html** - AI model comparison and evaluation interface
 - **crawl-dashboard.html** - Crawl management and monitoring interface
 - **admin-table.html** - Content labeling table interface with bulk operations
 - **admin-simple.html** - Simple content labeling interface
@@ -24,6 +25,7 @@ This repository contains the web-based dashboard interfaces for managing and mon
 - **css/** - Stylesheets (if any)
 
 ## Features
+- **Model Evaluation**: Compare AI models (OpenAI, Gemini, Gemma) side-by-side for content parsing
 
 - **Real-time Monitoring** - Live status updates and statistics
 - **Model Evaluation** - Compare AI models (OpenAI, Gemini, Gemma) side-by-side

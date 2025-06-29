@@ -366,37 +366,6 @@
                         📈 View API Status
                     </a>
                 </div>
-
-            <!-- Model Evaluation -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">🔬</div>
-                    <div>
-                        <div class="card-title">Model Evaluation</div>
-                        <div class="card-description">Compare AI models side-by-side for content parsing</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="available-models">4</div>
-                            <div class="stat-label">Available Models</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="model-types">3</div>
-                            <div class="stat-label">Model Types</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/model-evaluation-dashboard.html" class="btn btn-primary">
-                        ⚖️ Compare Models
-                    </a>
-                    <button class="btn btn-secondary" onclick="viewModelStats()">
-                        📊 View Stats
-                    </button>
-                </div>
-            </div>
             </div>
 
             <!-- Content Labeling -->
@@ -428,37 +397,6 @@
                         📝 Simple Interface
                     </a>
                 </div>
-
-            <!-- Model Evaluation -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">🔬</div>
-                    <div>
-                        <div class="card-title">Model Evaluation</div>
-                        <div class="card-description">Compare AI models side-by-side for content parsing</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="available-models">4</div>
-                            <div class="stat-label">Available Models</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="model-types">3</div>
-                            <div class="stat-label">Model Types</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/model-evaluation-dashboard.html" class="btn btn-primary">
-                        ⚖️ Compare Models
-                    </a>
-                    <button class="btn btn-secondary" onclick="viewModelStats()">
-                        📊 View Stats
-                    </button>
-                </div>
-            </div>
             </div>
 
             <!-- Cluster Management -->
@@ -490,37 +428,6 @@
                         📄 View Logs
                     </button>
                 </div>
-
-            <!-- Model Evaluation -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">🔬</div>
-                    <div>
-                        <div class="card-title">Model Evaluation</div>
-                        <div class="card-description">Compare AI models side-by-side for content parsing</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="available-models">4</div>
-                            <div class="stat-label">Available Models</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="model-types">3</div>
-                            <div class="stat-label">Model Types</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/model-evaluation-dashboard.html" class="btn btn-primary">
-                        ⚖️ Compare Models
-                    </a>
-                    <button class="btn btn-secondary" onclick="viewModelStats()">
-                        📊 View Stats
-                    </button>
-                </div>
-            </div>
             </div>
 
             <!-- System Operations -->
@@ -552,37 +459,6 @@
                         📊 System Stats
                     </button>
                 </div>
-
-            <!-- Model Evaluation -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">🔬</div>
-                    <div>
-                        <div class="card-title">Model Evaluation</div>
-                        <div class="card-description">Compare AI models side-by-side for content parsing</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="available-models">4</div>
-                            <div class="stat-label">Available Models</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="model-types">3</div>
-                            <div class="stat-label">Model Types</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/model-evaluation-dashboard.html" class="btn btn-primary">
-                        ⚖️ Compare Models
-                    </a>
-                    <button class="btn btn-secondary" onclick="viewModelStats()">
-                        📊 View Stats
-                    </button>
-                </div>
-            </div>
             </div>
 
             <!-- Areas Management -->
@@ -614,37 +490,6 @@
                         🔄 Sync Areas
                     </button>
                 </div>
-
-            <!-- Model Evaluation -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">🔬</div>
-                    <div>
-                        <div class="card-title">Model Evaluation</div>
-                        <div class="card-description">Compare AI models side-by-side for content parsing</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="available-models">4</div>
-                            <div class="stat-label">Available Models</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="model-types">3</div>
-                            <div class="stat-label">Model Types</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/model-evaluation-dashboard.html" class="btn btn-primary">
-                        ⚖️ Compare Models
-                    </a>
-                    <button class="btn btn-secondary" onclick="viewModelStats()">
-                        📊 View Stats
-                    </button>
-                </div>
-            </div>
             </div>
 
             <!-- Trending & Analytics -->
@@ -676,37 +521,6 @@
                         📊 View Analytics
                     </button>
                 </div>
-
-            <!-- Model Evaluation -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">🔬</div>
-                    <div>
-                        <div class="card-title">Model Evaluation</div>
-                        <div class="card-description">Compare AI models side-by-side for content parsing</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="available-models">4</div>
-                            <div class="stat-label">Available Models</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="model-types">3</div>
-                            <div class="stat-label">Model Types</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="/model-evaluation-dashboard.html" class="btn btn-primary">
-                        ⚖️ Compare Models
-                    </a>
-                    <button class="btn btn-secondary" onclick="viewModelStats()">
-                        📊 View Stats
-                    </button>
-                </div>
-            </div>
             </div>
         </div>
 
@@ -1013,24 +827,6 @@
 
         function exportData() {
             alert('Data Export\n\nExport functionality will be available soon.\nContact admin for manual exports.');
-        }
-
-
-        async function viewModelStats() {
-            try {
-                const response = await fetch("/api/flows/model-evaluation/stats");
-                const data = await response.json();
-                
-                if (data.success && data.data) {
-                    const models = data.data.availableModels.join(", ");
-                    const features = Object.values(data.data.features).join("\n- ");
-                    alert(`Model Evaluation Tool\n\nAvailable Models: ${models}\n\nFeatures:\n- ${features}`);
-                } else {
-                    alert("Model Evaluation Tool\n\nFailed to load model statistics.\nPlease check the API connection.");
-                }
-            } catch (error) {
-                alert("Model Evaluation Tool\n\nError: " + error.message);
-            }
         }
 
         function viewDocumentation() {
